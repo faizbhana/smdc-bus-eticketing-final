@@ -1,73 +1,60 @@
-# SMDC Travels — Bus E-Ticketing Prototype
+# SMDC Travels - ISM 3113 Final Project
 
-A single-file, static UI prototype of an **E-Ticketing for Buses** system for **SMDC Travels** (India, currency ₹).
-Built for **ISM3113 Assignment 6** — a working prototype of **Group 5's system**, implemented from the requirements
-captured in **Group 12's Assignment 4**. Everything runs in the browser: HTML + CSS + vanilla JS, no build step,
-state persisted in `localStorage`. The bank and email are simulated (persistent banner reminds the user).
+SMDC Travels is Group 5's browser-based bus e-ticketing prototype for the ISM 3113 final project. It demonstrates route search, seat selection, simulated reservations and role-based customer and staff screens. The application uses plain HTML, CSS and JavaScript; it needs no build step or server-side service.
 
-**Live demo:** https://theom720.github.io/smdc-bus-eticketing/
+## Links
 
-**AI model used:** Qwen3.8-27B — OBLITERATED, Fable 5
+- **Final website:** [https://faizbhana.github.io/smdc-bus-eticketing-final/](https://faizbhana.github.io/smdc-bus-eticketing-final/)
+- **GitHub repository:** [https://github.com/faizbhana/smdc-bus-eticketing-final](https://github.com/faizbhana/smdc-bus-eticketing-final)
+- **Group 12 original prototype reference:** [https://theom720.github.io/smdc-bus-eticketing/](https://theom720.github.io/smdc-bus-eticketing/) - reference only; it is not Group 5's final website.
 
-## Demo credentials
+## Demo accounts
+
+Use these seeded accounts to explore the role-specific screens:
 
 | Role | Email | Password |
-|------|-------|----------|
-| Customer | `customer@smdc.test` | `Travel@123` |
-| Manager | `manager@smdc.test` | `Manage@123` |
-| Admin | `admin@smdc.test` | `Admin@123` |
+|---|---|---|
+| Customer | `customer@demo.test` | `Demo123!` |
+| Manager | `manager@demo.test` | `Demo123!` |
+| Admin | `admin@demo.test` | `Demo123!` |
 
-**Demo payment PIN:** `4321`
+**Approved simulated payment PIN:** `246810`
 
-The login screen shows a "Demo credentials" help card — click any row to auto-fill.
-Use **Reset demo data** (footer) to clear `localStorage` and re-seed.
+These are public classroom credentials, not secure accounts. Do not enter real passwords, banking details, or government ID information.
 
-## Requirement → feature map
+## Implemented features
 
-| ID | Requirement | Where it is visible in the UI |
-|----|-------------|-------------------------------|
-| FR-01 | Register (name, email, gov ID, password) with validation | Register page — rejects blanks, bad email, short ID, weak password |
-| FR-02 | Login (email + password) | Login page |
-| FR-03 | Lock after failed attempts; admin unlock | 5 wrong passwords → account locked + unlock email; Admin → User accounts → Unlock |
-| FR-04 | Show schedules with date, time, price, seats remaining | Browse page route cards + per-date seats-left count |
-| FR-05 | Seat map with live availability (available/held/booked) | Booking page seat grid + colour legend |
-| FR-06 | Selecting a seat locks it with a visible hold timer | Tap seat → countdown pill "Seat held: m:ss" appears |
-| FR-07 | Confirmed booking + emailed receipt | Correct PIN + bank up → Confirmed, receipt in Inbox |
-| FR-07 | Confirmed booking + animated boarding pass (SVG "QR") + print | On confirm → success screen with a styled boarding pass, deterministic SVG code, **Print ticket**; reachable later from My bookings → **View ticket** |
-| FR-08 | Customer cancellation | My bookings → Cancel entire booking / cancel single seat |
-| FR-09 | Manager: manage bookings, edit schedule times, sales report, charts, CSV | Manager dashboard — inline SVG bar + donut charts, animated stat counters, **Export CSV**, live 5-min refresh |
-| FR-10 | Admin: manage routes, vehicles, user accounts | Admin console (Routes & vehicles / User accounts / Payment log / Audit log tabs) |
-| NFR-01 | Usable, branded, responsive UI | Whole app — SMDC brand palette, mobile-responsive layout |
-| NFR-02 | Timely confirmation / notification | Toast + Inbox email on confirm/pending |
-| NFR-05 | Manager dashboard refresh indicator | "Refreshed Xs ago · auto-refreshes every 5 min" — real 5-min `setInterval`, live ticking label |
-| DR-01 | Reject duplicate email / invalid input on register | Register with `customer@smdc.test` → "account already exists" |
-| DR-03 | One source of truth for seat state across users | Shared `localStorage` seat-state keyed route+date+time+seat; others' holds show as unavailable |
-| SR-01 | Display seats remaining | Seats-left count on each date pill (Browse) |
-| SR-03 | Account lockout after repeated failures | 5 failures → lock + simulated unlock email |
-| SR-04 | Admin audit log + payment log; account management | Admin → Audit log (every admin mutation) **and** Admin → Payment log (every confirmed/pending/rejected/refunded event with amount, user, date, time); User accounts → **Delete account** (confirm modal + audit entry; blocked for the only admin and the signed-in account) |
-| IR-01 | Bank API integration (PIN) decision logic | Payment section; PIN `4321`; decision table in code + `selfcheck.js` |
-| IR-04 | Email receipt pushed on confirmation | Inbox receives "Booking confirmed" email |
-| BR-02 | Seat held for a fixed window (5 min) | `SEAT_HOLD_MS = 5 * 60 * 1000` |
-| BR-03 | Hold auto-releases on expiry | Countdown hits 0 → seats released, toast shown |
-| BR-04 | Confirm only when bank up + PIN correct + seat locked | Payment decision table (`decidePayment`) |
-| BR-05 | Bank down → PENDING, hold retained, notification | "Simulate bank API down" toggle → Pending booking + email |
-| BR-06 | Block deleting a route with active bookings | Admin → Routes → Delete on a booked route is blocked ("deactivate instead") |
-| Q-02 | Pending-booking resolution workflow | My bookings → **Retry payment** on a pending booking (re-runs the decision; bank up + PIN → Confirmed + email + seats move held→booked). Manager → Bookings → **Resolve** also clears a pending booking. UI explains what PENDING means and how to clear it. |
-| Q-03 | Cancel a single seat of a multi-seat booking | My bookings → ✕ on an individual seat chip |
-| Q-04 | Audit trail of admin actions | Admin → Audit log |
-| Q-05 | Refund on cancellation | Cancelling a **confirmed** seat/booking issues a refund (booking shows "₹N refunded", a "Refund processed" email lands in the Inbox stating amount + original method, and the Manager report shows Gross − Refunds = **Net sales**). Cancelling a **pending** booking releases the hold with no charge. Refund policy note shown on the payment panel. Pure `refundFor()` logic is mirrored in `selfcheck.js`. |
-| Seat pref | Window vs aisle seat preference | Seat map marks each seat **W** (window) / **A** (aisle) with a tooltip (seat #, preference, fare); legend explains the markers |
-| UX | Advanced, interactive UI | Browse search/filter (From/To/sort + live result count + per-route occupancy bar + empty state); 3-step booking stepper + sticky summary + seat hover (#/fare); dark-mode toggle (persisted); skeleton-shimmer loading; smoother transitions and toasts; fully responsive |
+- Search five sample bus routes by origin, destination, and travel date. Route cards show departure details, fare, and available seats.
+- Register a demo customer and sign in with the seeded customer, manager, or admin accounts. Five failed sign-ins lock an account. Demo account recovery displays a simulated unlock email and unlocks that account without resetting other data. Registration stores the fictional ID locally.
+- Select up to four available seats. Selecting the first seat starts an immediate five-minute hold with a visible countdown. Additional selected seats share that original expiry. Closing unpaid checkout releases its hold.
+- Complete simulated checkout with a passenger name and PIN. The approved PIN produces a confirmed booking and an on-screen receipt; choosing the bank-unavailable simulation creates a pending booking with no charge. Retry the payment before expiry, cancel it, or let it expire automatically.
+- View customer bookings, receipts and on-screen demo notifications. Cancelling a confirmed seat records a full per-seat simulated refund to the original demo payment.
+- View manager dashboard metrics and booking records, cancel bookings, and edit departure times.
+- Use admin-only payment management to review pending payments using the demo PIN, cancel payments with a reason, and inspect confirmed/pending/rejected/refunded/cancelled/expired payment events and gross/refund/net totals. Manage routes and vehicles and review the local audit log. Customer accounts and passwords are not exposed in staff screens.
+- Browse the About page for demo notes and reset the sample data.
 
-## Files
+## Run and test
 
-- `index.html` — the entire application (inline `<style>` + `<script>`).
-- `selfcheck.js` — Node self-check of the payment-decision, seat-lock, and money logic (`node selfcheck.js`).
-- `DEMO-SCRIPT.md` — click-by-click walkthrough for the MS Teams recording.
+1. Open the final website above, or open `index.html` from a local copy of the repository in a browser. No package installation or build command is required.
+2. Search a route as a guest. Sign in with a demo account to try the corresponding customer or staff features.
+3. For a customer booking, choose a route, select seats, enter a passenger name, and use PIN `246810` for the successful simulated payment. The bank-unavailable option demonstrates a pending booking.
+4. Follow the scenarios in [`TEST_PLAN.md`](TEST_PLAN.md). It preserves the team's recorded results and separates them from automated checks and browser checks still required for the updated version.
+5. With Node.js installed, run `node --check app.js` and `node --test tests/workflows.test.cjs`. The workflow tests execute real application functions in an isolated DOM/state stub; they do not replace browser layout testing.
+6. To return to the seeded state, use **Reset sample data** on the About page.
 
-## Notes / simplifications
+The application files are [`index.html`](index.html), [`styles.css`](styles.css), and [`app.js`](app.js). The manual test checklist is [`TEST_PLAN.md`](TEST_PLAN.md).
 
-- Bank, email, and government-ID verification are **simulated** (prototype scope). The Inbox is a single shared demo
-  mailbox so graders can see every generated message in one place.
-- Routes cover **all 90 city pairs** across 10 cities (Mumbai, Pune, Delhi, Jaipur, Bengaluru, Chennai, Nashik, Hyderabad, Vijayawada, Coimbatore). Distances are computed via haversine; prices are derived from distance (≈ ₹2.20/km, min ₹150). Each route has **10 daily departure times** (5:30 AM through 10:30 PM); seat state is keyed by route + date + time so different slots hold seats independently. Use the **From / To filters** on Browse to narrow the schedule list. Storage key: `smdc_eticketing_v2`. Seats are a flat grid of 40 (2 + aisle + 2 per row). Window = the two outer columns, aisle = the two inner columns.
-- The boarding-pass "QR" is a deterministic SVG grid seeded from the booking ref (QR-styled finder corners), not a scannable code — it's a stable visual token, no library used. Charts are hand-drawn inline SVG (no chart library). Dark mode and all charts/seat colours read from the same CSS variables so both themes stay consistent.
+## Scope and limitations
+
+- This is a static, browser-only classroom prototype. Accounts, routes, bookings, holds, and audit entries are stored locally in the browser; they are not shared across browsers or users.
+- Authentication is not production-secure. Demo credentials and account data are handled client-side, and the demo PIN is not real payment verification.
+- No real payment, email, government-ID verification, server database, external route feed, or real refund processing is connected. Receipts and notifications are on-screen simulations.
+- Five minutes is the documented demo choice within the interview's unresolved 5–10 minute hold range. A full per-seat simulated refund is a demo policy; the real policy remains unconfirmed. Pending reservations expire without a charge and can be retried before expiry.
+- Recovery links appear on screen and can be used by anyone with the demo email; this is deliberately a classroom simulation, not proof of identity.
+- Data is retained only while this browser's storage remains intact. A 12-month retention guarantee and shared multi-user locking require a server and are not claimed. Old browser records are preserved; payment events start being logged when the updated version is used.
+- A five-minute hold is used for the demonstration. It is local to one browser and does not provide reliable multi-user seat locking.
+- The project does not claim production security, concurrent booking support, or any uptime guarantee.
+
+## Submission and walkthrough
+
+See [DELIVERABLES_WORKSHEET.md](DELIVERABLES_WORKSHEET.md) for the seven deliverables and the traceability/decision records, [AI_DEVELOPMENT_LOG.md](AI_DEVELOPMENT_LOG.md) for the required actual VS Code prompt evidence, and [DEMO_SCRIPT.md](DEMO_SCRIPT.md) for the proposed team recording sequence. The Teams recording, access check, and actual member contributions must be supplied by the group.
