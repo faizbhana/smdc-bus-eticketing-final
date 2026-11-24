@@ -59,3 +59,25 @@ Reviewer: Codex automated verification. Command: `node --test tests/workflows.te
 ## Updated limitations and demo policy
 
 Five-minute holds start on selection and are local to one browser. No true concurrent seat-locking guarantee is made. Pending reservations can be retried before expiry or cancelled, then expire without charge. Confirmed-seat cancellation uses a full per-seat simulated refund; real refund policy is unresolved. Recovery emails and customer notifications are displayed on screen only. Payment events contain no entered PIN, bank credentials, or government ID. Fictional IDs and demo passwords remain in browser storage, so use no real sensitive information. Existing payment history cannot be reconstructed reliably; legacy bookings may predate the event log. Data lasts only while localStorage is retained; 12-month retention, real bank/email/route integrations, security, load and uptime guarantees are deferred.
+
+## Published-release browser verification — 2026-11-24
+
+GitHub Pages deployment for merge `ec9f604` succeeded; asset-version follow-up `7fa10a2` also deployed successfully. Reviewer: Codex browser automation in the ChatGPT in-app browser (exact browser version not recorded). Fresh-release URL: https://faizbhana.github.io/smdc-bus-eticketing-final/?release=7fa10a2. Older cached homepage HTML may need a refresh; runtime assets are versioned as `20261124-1`.
+
+The following are actual observed live browser results for the updated application, and supersede the matching Pending entries above:
+
+| Live scenario | Observed result |
+|---|---|
+| Customer login; select S5 and S6 | Immediate countdown displayed 5:00 and then 4:50; total ₹1,240; availability decreased immediately. Pass. |
+| Wrong six-digit PIN | Clear bank rejection, no confirmation. Pass. |
+| Bank unavailable → My bookings → Retry payment with 246810 | Same booking changed from pending to confirmed; receipt reference and on-screen notification appeared. Pass. |
+| Cancel S5 from two-seat confirmation | S6 remained confirmed; current amount ₹620; simulated refund ₹620; refund notification displayed. Pass. |
+| Five wrong logins, then correct password | Account stayed locked. Pass. |
+| Demo recovery email/link → login | Account unlocked with existing password; prior bookings remained. Pass. |
+| Admin Payments | Rejected/pending/confirmed/refunded events and gross ₹1,240 / refunds ₹620 / net ₹620 displayed; no customer account credentials exposed. Pass. |
+| Admin cancellation with reason | Remaining seat cancelled with another ₹620 simulated refund; audit log recorded admin, time, booking, seat and reason. Pass. |
+| Responsive Explore screen | At 390 px, two-column navigation and usable search; document width 375 px. At 1440 px, document width 1425 px. No horizontal page overflow. Pass for this screen; exhaustive dialog/staff layout checks remain pending. |
+| Fresh public release | New recovery feature and `app.js?v=20261124-1` confirmed; site usable without GitHub sign-in. Pass. |
+| Browser errors during these workflows | No captured JavaScript errors. |
+
+Remaining browser checks: new-account registration/ID validation, pending-cancellation and full wall-clock expiry, admin approval of a pending payment, abandoned-hold release, schedule/route edits, receipt-dialog details, and exhaustive mobile/staff/dialog keyboard checks. Their logic is covered where listed in the automated suite; do not describe those as completed live browser checks.
