@@ -1,6 +1,6 @@
 # SMDC Travels — Test plan and evidence sheet
 
-The table below preserves the team's Pass results from commit `5ba4a38`. These results describe the earlier deployed version. Original human reviewer/date/browser details were not recorded and are still required; the automated checks below must not be presented as a person's browser testing.
+The table below preserves the team's Pass results from commit `5ba4a38`. These results describe the earlier deployed version. Faiz Bhana confirmed on November 24, 2026 that he used the supplied VS Code AI prompts and checked the website successfully. This is an overall human check, not a new per-case test record; exact browser/version and viewport were not recorded. Automated checks below are identified separately.
 
 | ID | Scenario | Expected result | Actual result / pass/fail / reviewer |
 |---|---|---|---|
@@ -22,7 +22,7 @@ The table below preserves the team's Pass results from commit `5ba4a38`. These r
 
 Limitations to disclose: static-site simulation only; browser-local sample data; no real bank API or email; no cross-user shared seat locking; no production secure authentication or load/uptime verification; five-minute hold is an unresolved-requirement assumption; refund process is unspecified.
 
-Actual browser/version checked: ______  Date: ______  Tested by: ______
+Latest human website verification: Faiz Bhana, November 24, 2026; reported result: website worked fine. Browser/version and viewport: not recorded.
 
 ## Updated-version verification — 2026-11-24
 
@@ -81,3 +81,7 @@ The following are actual observed live browser results for the updated applicati
 | Browser errors during these workflows | No captured JavaScript errors. |
 
 Remaining browser checks: new-account registration/ID validation, pending-cancellation and full wall-clock expiry, admin approval of a pending payment, abandoned-hold release, schedule/route edits, receipt-dialog details, and exhaustive mobile/staff/dialog keyboard checks. Their logic is covered where listed in the automated suite; do not describe those as completed live browser checks.
+
+## Human verification confirmation — 2026-11-24
+
+Faiz Bhana confirmed that he used the supplied VS Code AI prompts and checked the website successfully. This does not assign a new detailed observed result to every remaining browser scenario or claim a particular browser version or mobile width.
